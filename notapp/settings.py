@@ -7,19 +7,14 @@ Django settings for notapp project.
 
 import os
 from pathlib import Path
-from django.core.management.utils import get_random_secret_key
-from dotenv import load_dotenv
-
-# Load environment variables from .env (optional)
-load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", get_random_secret_key())
+SECRET_KEY = 'your-secret-key-keep-it-safe'  # Replace with a secure key in production
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
