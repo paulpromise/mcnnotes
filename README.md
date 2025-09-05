@@ -21,22 +21,26 @@ A simple, secure, and user-friendly note-taking web application built with Djang
 ## Getting Started
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/paulpromise/mcnnoteapp.git
    cd mcnnoteapp
    ```
 
 2. Install requirements:
+
    ```bash
    pip install -r requirement.txt
    ```
 
 3. Run migrations:
+
    ```bash
    python manage.py migrate
    ```
 
 4. Start the development server:
+
    ```bash
    python manage.py runserver
    ```
