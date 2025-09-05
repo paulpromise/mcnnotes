@@ -35,12 +35,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net', 'notapp.mcleanstech.com']
+ALLOWED_HOSTS = ['mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net', 'notapp.mcleanstech.com']
 
 # Security settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net',
-    'http://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net'
+    'mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net'
 ]
 CSRF_COOKIE_SECURE = False  # Set to False for now to debug
 SESSION_COOKIE_SECURE = False  # Set to False for now to debug
