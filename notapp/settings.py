@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-_#64+ej_(gz5f@1thfjb2os8%&_%hc&upp#d)yih4$kfv9y=(1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True  # Temporarily enabled for debugging
 
 ALLOWED_HOSTS = ['*']  # Be more specific in production
 
@@ -35,6 +35,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net',
     'http://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net'
 ]
+CSRF_COOKIE_DOMAIN = None
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = False  # Changed to False to handle both HTTP and HTTPS
@@ -64,7 +67,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'notes.middleware.DebugCsrfMiddleware',  # Replace default CSRF middleware with debug version
+    'notes.csrf.CustomCsrfMiddleware',  # Our custom CSRF middleware
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
