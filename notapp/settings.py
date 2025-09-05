@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-_#64+ej_(gz5f@1thfjb2os8%&_%hc&upp#d)yih4$kfv9y=(1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net', 'notapp.mcleanstech.com', ]
+ALLOWED_HOSTS = ['*']  # Be more specific in production
 
 
 
