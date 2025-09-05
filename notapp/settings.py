@@ -30,21 +30,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
+SECRET_KEY = 'django-insecure-your-secret-key'  # Replace with your actual secret key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily enable debug to see errors
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
-    'note.mcleanstech.com',
-    '*'  # Temporarily allow all hosts for debugging
+    'note.mcleanstech.com'
 ]
-# Security Settings
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # CSRF Settings
 CSRF_TRUSTED_ORIGINS = [
