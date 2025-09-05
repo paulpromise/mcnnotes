@@ -33,23 +33,14 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily set to True to see errors
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
-
-# Azure deployment settings
-AZURE_DEPLOYED = True
+ALLOWED_HOSTS = ['mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net', 'notapp.mcleanstech.com']
 
 # Security settings
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.azurewebsites.net',
-    'http://*.azurewebsites.net'
-]
-
-# Basic security headers
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+CSRF_TRUSTED_ORIGINS = ['https://*.azurewebsites.net']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # SSL/HTTPS settings
 SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS temporarily
