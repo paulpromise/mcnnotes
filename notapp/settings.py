@@ -21,23 +21,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+import os
+from pathlib import Path
+from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_#64+ej_(gz5f@1thfjb2os8%&_%hc&upp#d)yih4$kfv9y=(1'
+SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily enabled for debugging
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']  # Be more specific in production
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '')]
 
 # Security settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.azurewebsites.net',
-    'https://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net',
-    'http://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net'
+    f"https://{os.getenv('ALLOWED_HOSTS', '')}",
+    f"https://*.azurewebsites.net"
 ]
-CSRF_COOKIE_DOMAIN = None
-CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+# Enhanced Security Headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = False  # Changed to False to handle both HTTP and HTTPS
@@ -52,6 +64,33 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'notes' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")  # For inline styles if needed
+CSP_SCRIPT_SRC = ("'self'",)
+CSP_IMG_SRC = ("'self'",)
+CSP_FONT_SRC = ("'self'",)
+
+# Session Security
+SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+     'OPTIONS': {'min_length': 9}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# Django Axes Configuration (Login Security)
+AXES_FAILURE_LIMIT = 5  # Number of login attempts before lockout
+AXES_LOCKOUT_TIMEOUT = 30  # Minutes to lock out after failure limit is reached
+AXES_USE_USER_AGENT = True  # Include user agent in lockout criteria
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True  # Lock out based on both username and IP
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,10 +103,15 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'notes.csrf.CustomCsrfMiddleware',  # Our custom CSRF middleware
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',  # For login attempt tracking
+    'csp.middleware.CSPMiddleware',  # For Content Security Policy
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
