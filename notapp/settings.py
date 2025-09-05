@@ -33,23 +33,26 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = True  # Temporarily set to True to see errors
 
-ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '')]
+ALLOWED_HOSTS = ['*']
+
+# Azure deployment settings
+AZURE_DEPLOYED = True
 
 # Security settings
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{os.getenv('ALLOWED_HOSTS', '')}",
-    f"https://*.azurewebsites.net"
+    'https://*.azurewebsites.net',
+    'http://*.azurewebsites.net'
 ]
 
-# Enhanced Security Headers
+# Basic security headers
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# SSL/HTTPS settings
+SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS temporarily
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = False  # Changed to False to handle both HTTP and HTTPS
@@ -91,6 +94,23 @@ AXES_LOCKOUT_TIMEOUT = 30  # Minutes to lock out after failure limit is reached
 AXES_USE_USER_AGENT = True  # Include user agent in lockout criteria
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True  # Lock out based on both username and IP
 
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'ERROR'),
+        },
+    },
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -109,9 +129,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'axes.middleware.AxesMiddleware',  # For login attempt tracking
-    'csp.middleware.CSPMiddleware',  # For Content Security Policy
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
