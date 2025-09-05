@@ -33,11 +33,12 @@ load_dotenv()
 SECRET_KEY = 'django-insecure-your-secret-key'  # Replace with your actual secret key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True  # Temporarily enabled to see error details
 
 ALLOWED_HOSTS = [
     'mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
-    'note.mcleanstech.com'
+    'note.mcleanstech.com',
+    '*'
 ]
 
 # CSRF Settings
