@@ -40,10 +40,19 @@ ALLOWED_HOSTS = [
     'note.mcleanstech.com',
     '*'  # Temporarily allow all hosts for debugging
 ]
-CSRF_COOKIE_SECURE = False  # Set to False for now to debug
-SESSION_COOKIE_SECURE = False  # Set to False for now to debug
-SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS
+# Security Settings
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = [
+    'https://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
+    'https://note.mcleanstech.com'
+]
+CSRF_COOKIE_DOMAIN = '.azurewebsites.net'
+CSRF_USE_SESSIONS = True  # Store CSRF tokens in the session instead of cookies
 
 
 
@@ -105,7 +114,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'notes.csrf.CustomCsrfMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
