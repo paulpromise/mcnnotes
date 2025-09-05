@@ -29,6 +29,13 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']  # Be more specific in production
 
+# Security settings
+CSRF_TRUSTED_ORIGINS = ['https://*.azurewebsites.net']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 
 # Static files (CSS, JavaScript, Images)
