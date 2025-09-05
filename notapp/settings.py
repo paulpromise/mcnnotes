@@ -36,14 +36,16 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
-    'note.mcleanstech.com'
+    'mcleansnote.azurewebsites.net',
+    'note.mcleanstech.com',
+    'localhost',
+    '127.0.0.1'
 ]
 
 # Security settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
-    'http://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
+    'https://mcleansnote.azurewebsites.net',
+    'http://mcleansnote.azurewebsites.net',
     'https://note.mcleanstech.com',
     'http://note.mcleanstech.com'
 ]
