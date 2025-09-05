@@ -38,18 +38,14 @@ DEBUG = False
 ALLOWED_HOSTS = ['mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net', 'notapp.mcleanstech.com']
 
 # Security settings
-CSRF_TRUSTED_ORIGINS = ['https://*.azurewebsites.net']
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-
-# SSL/HTTPS settings
-SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS temporarily
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = False  # Changed to False to handle both HTTP and HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net',
+    'http://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net'
+]
+CSRF_COOKIE_SECURE = False  # Set to False for now to debug
+SESSION_COOKIE_SECURE = False  # Set to False for now to debug
+SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CSRF_USE_SESSIONS = True  # Store CSRF token in session instead of cookie
-CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to access the CSRF cookie
 
 
 
@@ -57,13 +53,7 @@ CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to access the CSRF cookie
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'notes' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Content Security Policy
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")  # For inline styles if needed
-CSP_SCRIPT_SRC = ("'self'",)
-CSP_IMG_SRC = ("'self'",)
-CSP_FONT_SRC = ("'self'",)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Session Security
 SESSION_COOKIE_AGE = 3600  # 1 hour
@@ -118,9 +108,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
