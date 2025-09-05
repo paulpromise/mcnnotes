@@ -28,9 +28,7 @@ def login_view(request):
             return redirect('note_list')
     else:
         form = AuthenticationForm()
-    response = render(request, 'notes/login.html', {'form': form})
-    response['X-CSRFToken'] = request.COOKIES.get('csrftoken', '')
-    return response
+    return render(request, 'notes/login.html', {'form': form})
 
 def logout_view(request):
 	logout(request)

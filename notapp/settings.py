@@ -25,15 +25,20 @@ ALLOWED_HOSTS = [
 # CSRF Settings
 CSRF_TRUSTED_ORIGINS = [
     "https://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
-    "http://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",  # Allow both HTTP and HTTPS
+    "http://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
     "https://note.mcleanstech.com",
-    "http://note.mcleanstech.com"  # Allow both HTTP and HTTPS
+    "http://note.mcleanstech.com",
+    "https://*.azurewebsites.net",
+    "http://*.azurewebsites.net"
 ]
 
 # Security Settings
-CSRF_COOKIE_SECURE = False  # Set to False temporarily to debug
-SESSION_COOKIE_SECURE = False  # Set to False temporarily to debug
-SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS for now
+CSRF_COOKIE_SECURE = True
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 INSTALLED_APPS = [
@@ -68,6 +73,7 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.template.context_processors.debug",
+                "django.template.context_processors.csrf",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
