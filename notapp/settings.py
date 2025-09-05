@@ -30,11 +30,17 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']  # Be more specific in production
 
 # Security settings
-CSRF_TRUSTED_ORIGINS = ['https://*.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.azurewebsites.net',
+    'https://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net',
+    'http://mcnotebookapp-cvfrhqa8fyd8aybd.eastus-01.azurewebsites.net'
+]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False  # Changed to False to handle both HTTP and HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_USE_SESSIONS = True  # Store CSRF token in session instead of cookie
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to access the CSRF cookie
 
 
 
@@ -58,7 +64,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'notes.middleware.DebugCsrfMiddleware',  # Replace default CSRF middleware with debug version
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
