@@ -33,21 +33,12 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True  # Temporarily enable debug to see errors
 
 ALLOWED_HOSTS = [
-    'mcleansnote.azurewebsites.net',
+    'mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net',
     'note.mcleanstech.com',
-    'localhost',
-    '127.0.0.1'
-]
-
-# Security settings
-CSRF_TRUSTED_ORIGINS = [
-    'https://mcleansnote.azurewebsites.net',
-    'http://mcleansnote.azurewebsites.net',
-    'https://note.mcleanstech.com',
-    'http://note.mcleanstech.com'
+    '*'  # Temporarily allow all hosts for debugging
 ]
 CSRF_COOKIE_SECURE = False  # Set to False for now to debug
 SESSION_COOKIE_SECURE = False  # Set to False for now to debug
