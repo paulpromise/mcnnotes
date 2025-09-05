@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'your-secret-key-keep-it-safe'  # Replace with a secure key in production
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True  # Temporarily set to True to see detailed errors
 
 ALLOWED_HOSTS = [
     "mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
@@ -25,10 +25,15 @@ ALLOWED_HOSTS = [
 # CSRF Settings
 CSRF_TRUSTED_ORIGINS = [
     "https://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
+    "http://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",  # Allow both HTTP and HTTPS
     "https://note.mcleanstech.com",
+    "http://note.mcleanstech.com"  # Allow both HTTP and HTTPS
 ]
-# Remove CSRF_COOKIE_DOMAIN unless strictly needed
-CSRF_USE_SESSIONS = True
+
+# Security Settings
+CSRF_COOKIE_SECURE = False  # Set to False temporarily to debug
+SESSION_COOKIE_SECURE = False  # Set to False temporarily to debug
+SECURE_SSL_REDIRECT = False  # Allow both HTTP and HTTPS for now
 
 # Application definition
 INSTALLED_APPS = [
@@ -46,7 +51,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "notes.csrf.CustomCsrfMiddleware",  # comment out for now
+    "django.middleware.csrf.CsrfViewMiddleware",  # Add default CSRF middleware
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
