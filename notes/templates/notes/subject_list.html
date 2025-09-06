@@ -1,0 +1,95 @@
+{% extends 'notes/base.html' %}
+{% load note_extras %}
+
+{% block title %}My Subjects{% endblock %}
+
+{% block extra_css %}
+<style>
+  .list-group-item {
+    transition: background-color 0.2s ease;
+  }
+  
+  .list-group-item:hover {
+    background-color: rgba(0,0,0,0.02);
+  }
+  
+  .list-group-item .action-buttons {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+  
+  .list-group-item:hover .action-buttons {
+    opacity: 1;
+  }
+  
+  .list-group-item a.stretched-link::after {
+    z-index: 1;
+  }
+  
+  .list-group-item .btn {
+    position: relative;
+    z-index: 3;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="mb-0">My Subjects</h1>
+    {% if subjects %}
+    <p class="text-muted mb-0">
+      You have {{ subjects|length }} subject{% if subjects|length != 1 %}s{% endif %}
+    </p>
+    {% endif %}
+  </div>
+  <div>
+    <a href="{% url 'subject_create' %}" class="btn btn-custom">
+      <i class="bi bi-plus-lg"></i> New Subject
+    </a>
+    <a href="{% url 'note_list' %}" class="btn btn-outline-secondary ms-2">
+      <i class="bi bi-journal-text"></i> Back to Notes
+    </a>
+  </div>
+</div>
+
+{% if subjects %}
+<!-- Subjects List -->
+<div class="card">
+  <div class="list-group list-group-flush">
+    {% for subject in subjects %}
+    <div class="list-group-item position-relative">
+      <a href="{% url 'subject_detail' subject.pk %}" class="text-decoration-none text-dark stretched-link">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-folder me-2"></i>
+            <div>
+              <h6 class="mb-0">{{ subject.name }}</h6>
+              {% with note_count=subject_note_counts|get_item:subject.id %}
+              <small class="text-muted">{{ note_count }} Note{% if note_count != 1 %}s{% endif %}</small>
+              {% endwith %}
+            </div>
+          </div>
+          <div class="action-buttons" style="z-index: 2; position: relative;">
+            <a href="{% url 'note_create' %}?subject={{ subject.pk }}" class="btn btn-sm btn-custom me-1">
+              <i class="bi bi-plus-lg"></i> Add Note
+            </a>
+            <a href="{% url 'subject_edit' subject.pk %}" class="btn btn-sm btn-outline-secondary me-1">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="{% url 'subject_delete' subject.pk %}" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i>
+            </a>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+  <p class="mb-0">You don't have any subjects yet. Create one to organize your notes!</p>
+</div>
+{% endif %} {% endblock %}

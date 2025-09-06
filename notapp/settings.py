@@ -14,11 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'your-secret-key-keep-it-safe'  # Replace with a secure key in production
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily set to True to see detailed errors
+DEBUG = False# Temporarily set to True to see detailed errors
 
 ALLOWED_HOSTS = [
     "mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
-    "note.mcleanstech.com",
     "*",  # for testing, tighten later
 ]
 
@@ -26,8 +25,6 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
     "http://mcleansnote-g2ghfaddc3f3c4b9.eastus-01.azurewebsites.net",
-    "https://note.mcleanstech.com",
-    "http://note.mcleanstech.com",
     "https://*.azurewebsites.net",
     "http://*.azurewebsites.net"
 ]
@@ -53,10 +50,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Add whitenoise for static files
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",  # Add default CSRF middleware
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -144,3 +141,4 @@ LOGGING = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+

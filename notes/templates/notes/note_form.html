@@ -1,44 +1,217 @@
-{% extends 'notes/base.html' %} {% block title %}{% if form.instance.pk %}Edit Note{% else %}New
-Note{% endif %}{% endblock %} {% block content %}
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-body p-4">
-          <h2 class="card-title text-center mb-4">
-            {% if form.instance.pk %} Edit Note {% else %} Create New Note {% endif %}
-          </h2>
-          <form method="post">
-            {% csrf_token %} {% if form.errors %}
-            <div class="alert alert-danger">
-              <ul class="mb-0">
-                {% for field in form %} {% for error in field.errors %}
-                <li>{{ error }}</li>
-                {% endfor %} {% endfor %}
-              </ul>
-            </div>
-            {% endif %}
-            <div class="mb-3">
-              <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
-              {{ form.title }}
-            </div>
-            <div class="mb-3">
-              <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
-              {{ form.content }}
-            </div>
-            <div class="d-flex justify-content-between">
-              <a href="{% url 'note_list' %}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back
+{% extends 'notes/base.html' %}
+
+{% block title %}
+  {% if form.instance.pk %}Edit Note{% else %}New Note{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .note-form-container {
+    background-color: #ffffff;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-form-container form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-header {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    z-index: 100;
+    margin-bottom: 1rem;
+  }
+
+  .note-content {
+    flex: 1;
+    padding: 1rem;
+  }
+
+  .note-form-container select {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0;
+    width: auto;
+  }
+
+  .note-form-container input[type="text"] {
+    border: none !important;
+    padding: 0.5rem;
+    margin-bottom: 0;
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 500;
+    background: transparent !important;
+  }
+
+  .note-form-container input[type="text"]:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .note-form-container input[type="text"]::placeholder {
+    color: #adb5bd;
+    opacity: 0.7;
+  }
+
+  .note-form-container textarea {
+    flex: 1;
+    border: none !important;
+    padding: 1rem;
+    font-size: 16px;
+    line-height: 1.6;
+    resize: none;
+    min-height: 400px;
+    background-color: #ffffff !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .note-form-container textarea:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .note-form-container .form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+  }
+
+  .note-footer {
+    position: sticky;
+    bottom: 0;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .note-form-container label {
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .form-title {
+    font-family: 'Courier New', Courier, monospace;
+    color: #2c3e50;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Auto-resize textarea
+  const textarea = document.querySelector('textarea');
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+  
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  });
+
+  // Handle Ctrl+S to save
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      document.querySelector('form').submit();
+    }
+  });
+
+  // Focus title if new note, content if editing
+  if (!document.querySelector('form').action.includes('update')) {
+    document.querySelector('input[type="text"]').focus();
+  } else {
+    textarea.focus();
+  }
+
+  // Set textarea tab behavior
+  textarea.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = this.selectionStart;
+      const end = this.selectionEnd;
+      this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+      this.selectionStart = this.selectionEnd = start + 4;
+    }
+  });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="note-form-container">
+  <form method="post" class="h-100">
+    {% csrf_token %}
+    
+    <div class="note-header">
+      <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center flex-grow-1">
+            {% if form.instance.pk %}
+              <a href="javascript:history.back()" class="btn btn-link text-dark me-2">
+                <i class="bi bi-arrow-left"></i>
               </a>
-              <button type="submit" class="btn btn-custom">
-                <i class="bi bi-save"></i>
-                {% if form.instance.pk %} Save Changes {% else %} Create Note {% endif %}
-              </button>
-            </div>
-          </form>
+            {% else %}
+              <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-link text-dark me-2">
+                <i class="bi bi-arrow-left"></i>
+              </a>
+            {% endif %}
+            {% with title_field=form.title %}
+              <input type="text" name="{{ title_field.name }}" 
+                     {% if title_field.value %}value="{{ title_field.value }}"{% endif %}
+                     class="form-control" id="{{ title_field.id_for_label }}"
+                     placeholder="Note title..."
+                     autocomplete="off">
+            {% endwith %}
+          </div>
+        <button type="submit" class="btn btn-custom">
+          <i class="bi bi-save"></i>
+          {% if form.instance.pk %} Save {% else %} Create {% endif %}
+        </button>
+      </div>
+
+      {% if form.errors %}
+      <div class="alert alert-danger mt-3 mb-0">
+        <ul class="mb-0">
+          {% for field in form %} {% for error in field.errors %}
+          <li>{{ error }}</li>
+          {% endfor %} {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="note-content">
+      {{ form.content }}
+    </div>
+
+    <div class="note-footer">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <label for="{{ form.subject.id_for_label }}" class="form-label mb-0 me-2">Subject:</label>
+            {{ form.subject }}
+          </div>
+          {% if current_subject %}
+          <small class="text-muted">
+            Default: <strong>{{ current_subject.name }}</strong>
+          </small>
+          {% endif %}
         </div>
+        <small class="text-muted">Press Ctrl+S to save</small>
       </div>
     </div>
-  </div>
+  </form>
 </div>
 {% endblock %}

@@ -1,52 +1,153 @@
-{% extends 'notes/base.html' %} {% block title %}My Notes{% endblock %} {% block content %}
-<div class="container mt-4">
+{% extends "notes/base.html" %}
+{% load humanize %}
+
+{% block title %}My Notes{% endblock title %}
+
+{% block extra_css %}
+<style>
+  .note-card {
+    transition: all 0.2s ease;
+    position: relative;
+    padding: 16px;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .note-card:hover {
+    background-color: #f8f9fa;
+  }
+
+  .note-card .card-title {
+    color: #2c3e50;
+    max-width: 90%;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+
+  .note-card .content {
+    color: #34495e;
+    line-height: 1.8;
+    position: relative;
+    z-index: 1;
+    white-space: pre-line;
+  }
+
+  .note-card .content p {
+    margin-bottom: 0.5rem;
+  }
+
+  .note-card .btn-link {
+    color: #2c3e50;
+    text-decoration: none;
+  }
+
+  .note-card .btn-link:hover {
+    color: #000;
+  }
+
+  .note-card:hover {
+    background-color: rgba(0,0,0,0.02);
+  }
+
+  .note-card .subject-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: #ffd54f;
+    padding: 4px 12px;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 0.8rem;
+    color: #5d4037;
+    transform: rotate(2deg);
+  }
+
+  .empty-state {
+    color: var(--primary-color);
+  }
+
+  .note-card .dropdown-menu {
+    background-color: #fff9c4;
+    border: none;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+  }
+
+  .note-card .dropdown-item:hover {
+    background-color: #fff176;
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div>
   <!-- Header Section -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="mb-0">My Notes</h1>
+      <h1 class="mb-0">
+        {% if current_subject %}
+          Notes: {{ current_subject.name }}
+        {% else %}
+          All Notes
+        {% endif %}
+      </h1>
       {% if notes %}
       <p class="text-muted mb-0">
-        You have {{ notes|length }} note{% if notes|length != 1 %}s{% endif %}
+        You have {{ notes.paginator.count }} note{% if notes.paginator.count != 1 %}s{% endif %}
+        {% if current_subject %}
+          in {{ current_subject.name }}
+        {% endif %}
+        (showing {{ notes.start_index }}-{{ notes.end_index }})
       </p>
       {% endif %}
     </div>
-    <a href="{% url 'note_create' %}" class="btn btn-custom">
-      <i class="bi bi-plus-lg"></i> New Note
-    </a>
+    <div>
+      {% if current_subject %}
+      <a href="{% url 'note_create' %}?subject={{ current_subject.id }}" class="btn btn-custom">
+        <i class="bi bi-plus-lg"></i> New Note in {{ current_subject.name }}
+      </a>
+      {% else %}
+      <a href="{% url 'note_create' %}" class="btn btn-custom">
+        <i class="bi bi-plus-lg"></i> New Note
+      </a>
+      {% endif %}
+      <a href="{% url 'subject_create' %}" class="btn btn-outline-secondary ms-2">
+        <i class="bi bi-folder-plus"></i> New Subject
+      </a>
+    </div>
   </div>
 
   {% if notes %}
   <!-- Notes Grid -->
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for note in notes %}
-    <div class="col">
-      <div class="card note-card h-100 shadow-sm">
+        <div class="col-12">
+      <div class="card note-card h-100 border-0">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="card-title mb-0 text-truncate pe-2">{{ note.title }}</h5>
-            <div class="dropdown">
-              <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots-vertical"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="{% url 'note_edit' note.pk %}">
-                    <i class="bi bi-pencil me-2"></i> Edit
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item text-danger" href="{% url 'note_delete' note.pk %}">
-                    <i class="bi bi-trash me-2"></i> Delete
-                  </a>
-                </li>
-              </ul>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              {% if not note.subject or subject_id %}
+                <a href="{% url 'note_edit' pk=note.pk %}" class="text-decoration-none">
+                  <h2 class="h5 mb-1">{{ note.title }}</h2>
+                  <div class="text-muted small mb-1">
+                    {{ note.created_at|naturaltime }}
+                  </div>
+                </a>
+              {% else %}
+                <a href="{% url 'subject_detail' pk=note.subject.pk %}" class="h5 btn-link d-block mb-1">{{ note.subject.name }}</a>
+                <div class="text-muted small mb-1">{{ note.created_at|naturaltime }}</div>
+              {% endif %}
+            </div>
+            <div>
+              <a href="{% url 'note_edit' pk=note.pk %}" class="btn-link me-2">Edit</a>
+              <a href="{% url 'note_delete' pk=note.pk %}" class="btn-link text-danger">Delete</a>
             </div>
           </div>
-          <p class="card-text" style="min-height: 4.5rem">{{ note.content|truncatewords:30 }}</p>
-          <div class="d-flex align-items-center text-muted small">
-            <i class="bi bi-clock me-1"></i>
-            <span>Updated {{ note.updated_at|date:"M d, Y H:i" }}</span>
-          </div>
+          {% if current_subject %}
+          <div class="content mt-2">{{ note.content }}</div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -65,51 +166,41 @@
     </a>
   </div>
   {% endif %}
+
+  {% if notes.paginator.num_pages > 1 %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if notes.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ notes.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in notes.paginator.page_range %}
+            {% if notes.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > notes.number|add:'-3' and num < notes.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if notes.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ notes.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+  {% endif %}
 </div>
-
-<!-- Add some custom styles -->
-{% block extra_css %}
-<style>
-  .note-card {
-    transition: all 0.3s ease;
-    border: none;
-    background-color: white;
-  }
-
-  .note-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-  }
-
-  .note-card .card-title {
-    color: var(--primary-color);
-    max-width: 90%;
-  }
-
-  .note-card .dropdown-toggle::after {
-    display: none;
-  }
-
-  .note-card .btn-link {
-    color: var(--primary-color);
-    text-decoration: none;
-  }
-
-  .note-card .btn-link:hover {
-    color: var(--primary-hover);
-  }
-
-  .note-card .card-text {
-    color: #6c757d;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .empty-state {
-    color: var(--primary-color);
-  }
-</style>
-{% endblock %} {% endblock %}
+{% endblock content %}
