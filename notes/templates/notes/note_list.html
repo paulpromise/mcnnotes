@@ -10,29 +10,32 @@
     position: relative;
     padding: 16px;
     background: #ffffff;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin-bottom: 1rem;
   }
 
   .note-card:hover {
     background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   }
 
   .note-card .card-title {
     color: #2c3e50;
-    max-width: 90%;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
-    border-bottom: 2px solid rgba(0,0,0,0.1);
-    padding-bottom: 8px;
-    margin-bottom: 12px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    word-break: break-word;
   }
 
   .note-card .content {
     color: #34495e;
-    line-height: 1.8;
+    line-height: 1.6;
     position: relative;
-    z-index: 1;
     white-space: pre-line;
+    font-size: 0.95rem;
+    word-break: break-word;
   }
 
   .note-card .content p {
@@ -42,41 +45,89 @@
   .note-card .btn-link {
     color: #2c3e50;
     text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
   }
 
   .note-card .btn-link:hover {
     color: #000;
-  }
-
-  .note-card:hover {
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(0,0,0,0.05);
   }
 
   .note-card .subject-badge {
-    position: absolute;
-    top: -10px;
-    right: 20px;
+    display: inline-block;
     background: #ffd54f;
-    padding: 4px 12px;
-    border-radius: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
     font-size: 0.8rem;
     color: #5d4037;
-    transform: rotate(2deg);
+    margin-bottom: 0.5rem;
   }
 
   .empty-state {
     color: var(--primary-color);
   }
 
-  .note-card .dropdown-menu {
-    background-color: #fff9c4;
-    border: none;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+  .note-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
   }
 
-  .note-card .dropdown-item:hover {
-    background-color: #fff176;
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+
+  .page-subtitle {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 768px) {
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .header-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .note-card {
+      padding: 12px;
+      margin-bottom: 0.75rem;
+    }
+
+    .note-actions {
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      font-size: 1.25rem;
+    }
+
+    .pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+
+    .pagination .page-item {
+      margin: 0 2px;
+    }
   }
 </style>
 {% endblock extra_css %}
@@ -84,70 +135,74 @@
 {% block content %}
 <div>
   <!-- Header Section -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="mb-0">
-        {% if current_subject %}
-          Notes: {{ current_subject.name }}
-        {% else %}
-          All Notes
+  <div class="page-header">
+    <div class="row align-items-start">
+      <div class="col-12 col-md-7">
+        <h1 class="page-title">
+          {% if current_subject %}
+            Notes: {{ current_subject.name }}
+          {% else %}
+            All Notes
+          {% endif %}
+        </h1>
+        {% if notes %}
+        <p class="page-subtitle">
+          You have {{ notes.paginator.count }} note{% if notes.paginator.count != 1 %}s{% endif %}
+          {% if current_subject %}
+            in {{ current_subject.name }}
+          {% endif %}
+          (showing {{ notes.start_index }}-{{ notes.end_index }})
+        </p>
         {% endif %}
-      </h1>
-      {% if notes %}
-      <p class="text-muted mb-0">
-        You have {{ notes.paginator.count }} note{% if notes.paginator.count != 1 %}s{% endif %}
-        {% if current_subject %}
-          in {{ current_subject.name }}
-        {% endif %}
-        (showing {{ notes.start_index }}-{{ notes.end_index }})
-      </p>
-      {% endif %}
-    </div>
-    <div>
-      {% if current_subject %}
-      <a href="{% url 'note_create' %}?subject={{ current_subject.id }}" class="btn btn-custom">
-        <i class="bi bi-plus-lg"></i> New Note in {{ current_subject.name }}
-      </a>
-      {% else %}
-      <a href="{% url 'note_create' %}" class="btn btn-custom">
-        <i class="bi bi-plus-lg"></i> New Note
-      </a>
-      {% endif %}
-      <a href="{% url 'subject_create' %}" class="btn btn-outline-secondary ms-2">
-        <i class="bi bi-folder-plus"></i> New Subject
-      </a>
+      </div>
+      <div class="col-12 col-md-5">
+        <div class="header-actions">
+          {% if current_subject %}
+          <a href="{% url 'note_create' %}?subject={{ current_subject.id }}" class="btn btn-custom">
+            <i class="bi bi-plus-lg"></i> New Note in {{ current_subject.name }}
+          </a>
+          {% else %}
+          <a href="{% url 'note_create' %}" class="btn btn-custom">
+            <i class="bi bi-plus-lg"></i> New Note
+          </a>
+          {% endif %}
+          <a href="{% url 'subject_create' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-folder-plus"></i> New Subject
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
   {% if notes %}
-  <!-- Notes Grid -->
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <!-- Notes List -->
+  <div class="notes-container">
     {% for note in notes %}
-        <div class="col-12">
-      <div class="card note-card h-100 border-0">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              {% if not note.subject or subject_id %}
-                <a href="{% url 'note_edit' pk=note.pk %}" class="text-decoration-none">
-                  <h2 class="h5 mb-1">{{ note.title }}</h2>
-                  <div class="text-muted small mb-1">
-                    {{ note.created_at|naturaltime }}
-                  </div>
-                </a>
-              {% else %}
-                <a href="{% url 'subject_detail' pk=note.subject.pk %}" class="h5 btn-link d-block mb-1">{{ note.subject.name }}</a>
-                <div class="text-muted small mb-1">{{ note.created_at|naturaltime }}</div>
-              {% endif %}
-            </div>
-            <div>
-              <a href="{% url 'note_edit' pk=note.pk %}" class="btn-link me-2">Edit</a>
-              <a href="{% url 'note_delete' pk=note.pk %}" class="btn-link text-danger">Delete</a>
-            </div>
-          </div>
-          {% if current_subject %}
-          <div class="content mt-2">{{ note.content }}</div>
-          {% endif %}
+    <div class="note-card">
+      {% if note.subject and not subject_id %}
+        <div class="subject-badge">{{ note.subject.name }}</div>
+      {% endif %}
+      
+      <div class="note-content">
+        <a href="{% url 'note_edit' pk=note.pk %}" class="text-decoration-none">
+          <h2 class="card-title">{{ note.title }}</h2>
+        </a>
+        
+        <div class="text-muted small mb-2">
+          {{ note.created_at|naturaltime }}
+        </div>
+        
+        {% if current_subject %}
+        <div class="content">{{ note.content }}</div>
+        {% endif %}
+        
+        <div class="note-actions">
+          <a href="{% url 'note_edit' pk=note.pk %}" class="btn-link">
+            <i class="bi bi-pencil"></i> Edit
+          </a>
+          <a href="{% url 'note_delete' pk=note.pk %}" class="btn-link text-danger">
+            <i class="bi bi-trash"></i> Delete
+          </a>
         </div>
       </div>
     </div>
@@ -161,45 +216,45 @@
     </div>
     <h2 class="h4 mb-3">No Notes Yet</h2>
     <p class="text-muted mb-4">Create your first note to get started!</p>
-    <a href="{% url 'note_create' %}" class="btn btn-custom btn-lg">
-      <i class="bi bi-plus-lg me-2"></i> Create Your First Note
-    </a>
+    <div class="d-grid gap-2 col-12 col-md-6 col-lg-4 mx-auto">
+      <a href="{% url 'note_create' %}" class="btn btn-custom btn-lg">
+        <i class="bi bi-plus-lg me-2"></i> Create Your First Note
+      </a>
+    </div>
   </div>
   {% endif %}
 
   {% if notes.paginator.num_pages > 1 %}
-  <div class="row mt-4">
-    <div class="col-12">
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          {% if notes.has_previous %}
+  <div class="mt-4">
+    <nav aria-label="Page navigation" class="d-flex justify-content-center">
+      <ul class="pagination flex-wrap">
+        {% if notes.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ notes.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in notes.paginator.page_range %}
+          {% if notes.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% elif num > notes.number|add:'-3' and num < notes.number|add:'3' %}
             <li class="page-item">
-              <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ notes.previous_page_number }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
+              <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ num }}">{{ num }}</a>
             </li>
           {% endif %}
+        {% endfor %}
 
-          {% for num in notes.paginator.page_range %}
-            {% if notes.number == num %}
-              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > notes.number|add:'-3' and num < notes.number|add:'3' %}
-              <li class="page-item">
-                <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ num }}">{{ num }}</a>
-              </li>
-            {% endif %}
-          {% endfor %}
-
-          {% if notes.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ notes.next_page_number }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
+        {% if notes.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if current_subject %}subject={{ current_subject.id }}&{% endif %}page={{ notes.next_page_number }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
   </div>
   {% endif %}
 </div>
